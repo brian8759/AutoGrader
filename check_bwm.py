@@ -35,22 +35,12 @@ def read_list(fname, delim=','):
         ret.append(ls)
     return ret
 
-def verifyTopo():
+def verifyTopo(**kwargs):
     currentDir = os.getcwd()
-    stuInfoPath = os.path.join(currentDir, args.file)
-    stuInfoFile = open(stuInfoPath, 'r')
-    submissionDir = stuInfoFile.readline()
-    submissionDir = submissionDir.rstrip('\n')
-    gradePath = stuInfoFile.readline()
-    gradePath = gradePath.rstrip('\n')
-    commentPath = stuInfoFile.readline()
-    commentPath = commentPath.rstrip('\n')
-    
     errorCount = 0
     for i in range(2, 6):
         fileName = 'n'+str(i)
         filePath = os.path.join(currentDir, args.dir, fileName, 'bwm.txt')
-        r = acceptable_range[str(i)]
         data = read_list(filePath)
         rate = {}
         column = 3
@@ -80,34 +70,21 @@ def verifyTopo():
                     errorCount += 1
                     print 'Error', filePath
     if errorCount != 0:
-        commentFile = open(commentPath, 'a+')
+        commentFile = open(kwargs["comment"], 'a+')
         commentFile.write('topo setup is not right\n')
         commentFile.close()
     
-    gradeFile = open(gradePath, 'a+')
+    gradeFile = open(kwargs["grade"], 'a+')
     gradeFile.write(str(errorCount))
     gradeFile.write('\n')
     gradeFile.close()
 
-def verifyBWM():
-    currentDir = os.getcwd()
-    stuInfoPath = os.path.join(currentDir, args.file)
-    stuInfoFile = open(stuInfoPath, 'r')
-    # the first line is the submission dir
-    # the second line is the grade.txt
-    # the third line is the comments.txt
-    submissionDir = stuInfoFile.readline()
-    submissionDir = submissionDir.rstrip('\n')
-    gradePath = stuInfoFile.readline()
-    gradePath = gradePath.rstrip('\n')
-    commentPath = stuInfoFile.readline()
-    commentPath = commentPath.rstrip('\n')
-    
+def verifyBWM(**kwargs):
     errorCount = 0
     #in submission dir, there are several bwm.txt files
     for i in range(2, 6):
         fileName = 'bwm'+str(i)+'.txt'
-        filePath = os.path.join(submissionDir, fileName)
+        filePath = os.path.join(kwargs["submission"], fileName)
         
         r = acceptable_range[str(i)]
         data = read_list(filePath)
@@ -139,28 +116,19 @@ def verifyBWM():
                     print 'error', filePath
 
     if errorCount != 0:
-        commentFile = open(commentPath,'a+')
+        commentFile = open(kwargs["comment"],'a+')
         commentFile.write('BWM output is not acceptable\n')
         commentFile.close()
         
-    gradeFile =open(gradePath,'a+')
+    gradeFile =open(kwargs["grade"],'a+')
     gradeFile.write(str(errorCount))
     gradeFile.write('\n')
     gradeFile.close()
 
-def verifyQuiz():
-    currentDir = os.getcwd()
-    stuInfoPath = os.path.join(currentDir, args.file)
-    stuInfoFile = open(stuInfoPath, 'r')
-    submissionDir = stuInfoFile.readline()
-    submissionDir = submissionDir.rstrip('\n')
-    gradePath = stuInfoFile.readline()
-    gradePath = gradePath.rstrip('\n')
-    commentPath = stuInfoFile.readline()
-    commentPath = commentPath.rstrip('\n')
+def verifyQuiz(**kwargs):
     
     answer = [['B'], ['C', 'D'], ['A'], ['D'], ['D'], ['B']]
-    quizPath = os.path.join(submissionDir, "quiz.txt")
+    quizPath = os.path.join(kwargs["submission"], "quiz.txt")
     if not os.path.isfile(quizPath):
         # no quiz.txt
         return
@@ -186,21 +154,18 @@ def verifyQuiz():
     print 'bonus', bonus
 
     if errorCount != 0:
-        commentFile = open(commentPath,'a+')
+        commentFile = open(kwargs["comment"],'a+')
         for item in answer:
             commentFile.write("%s\n" % item)
 
         commentFile.close()
         
-    gradeFile =open(gradePath,'a+')
+    gradeFile = open(kwargs["grade"],'a+')
     gradeFile.write(str(errorCount*0.5))
     gradeFile.write('\n')
     gradeFile.close()
 
-def main():
-    verifyTopo()
-    verifyBWM()
-    verifyQuiz()
+
 
 def check(bwmRate):
     checkRate = bwmRate[2:]
@@ -221,10 +186,31 @@ def checkBwmRange(bwmRate, rateRange):
         if r <= rateRange[1] and r >= rateRange[0]:
             continue
         else:
-            print r
+            #print r
             return False
     
     return True
 
+
+def getFilePath():
+    currentDir = os.getcwd()
+    stuInfoPath = os.path.join(currentDir, args.file)
+    stuInfoFile = open(stuInfoPath, 'r')
+    submissionDir = stuInfoFile.readline()
+    submissionDir = submissionDir.rstrip('\n')
+    gradePath = stuInfoFile.readline()
+    gradePath = gradePath.rstrip('\n')
+    commentPath = stuInfoFile.readline()
+    commentPath = commentPath.rstrip('\n')
+    
+    filePathDict = {"submission" : submissionDir, "grade" : gradePath, "comment" : commentPath}
+    return filePathDict
+
+def main():
+    filePathDict = getFilePath()
+    verifyTopo(filePathDict)
+    verifyBWM(filePathDict)
+    verifyQuiz(filePathDict)
+    
 if __name__ == '__main__':
     main()
