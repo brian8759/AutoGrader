@@ -35,7 +35,7 @@ def read_list(fname, delim=','):
         ret.append(ls)
     return ret
 
-def verifyTopo(**kwargs):
+def verifyTopo(submission, grade, comment):
     currentDir = os.getcwd()
     errorCount = 0
     for i in range(2, 6):
@@ -70,21 +70,21 @@ def verifyTopo(**kwargs):
                     errorCount += 1
                     print 'Error', filePath
     if errorCount != 0:
-        commentFile = open(kwargs["comment"], 'a+')
+        commentFile = open(comment, 'a+')
         commentFile.write('topo setup is not right\n')
         commentFile.close()
     
-    gradeFile = open(kwargs["grade"], 'a+')
+    gradeFile = open(grade, 'a+')
     gradeFile.write(str(errorCount))
     gradeFile.write('\n')
     gradeFile.close()
 
-def verifyBWM(**kwargs):
+def verifyBWM(submission, grade, comment):
     errorCount = 0
     #in submission dir, there are several bwm.txt files
     for i in range(2, 6):
         fileName = 'bwm'+str(i)+'.txt'
-        filePath = os.path.join(kwargs["submission"], fileName)
+        filePath = os.path.join(submission, fileName)
         
         r = acceptable_range[str(i)]
         data = read_list(filePath)
@@ -116,19 +116,19 @@ def verifyBWM(**kwargs):
                     print 'error', filePath
 
     if errorCount != 0:
-        commentFile = open(kwargs["comment"],'a+')
+        commentFile = open(comment,'a+')
         commentFile.write('BWM output is not acceptable\n')
         commentFile.close()
         
-    gradeFile =open(kwargs["grade"],'a+')
+    gradeFile =open(grade,'a+')
     gradeFile.write(str(errorCount))
     gradeFile.write('\n')
     gradeFile.close()
 
-def verifyQuiz(**kwargs):
+def verifyQuiz(submission, grade, comment):
     
     answer = [['B'], ['C', 'D'], ['A'], ['D'], ['D'], ['B']]
-    quizPath = os.path.join(kwargs["submission"], "quiz.txt")
+    quizPath = os.path.join(submission, "quiz.txt")
     if not os.path.isfile(quizPath):
         # no quiz.txt
         return
@@ -154,13 +154,13 @@ def verifyQuiz(**kwargs):
     print 'bonus', bonus
 
     if errorCount != 0:
-        commentFile = open(kwargs["comment"],'a+')
+        commentFile = open(comment,'a+')
         for item in answer:
             commentFile.write("%s\n" % item)
 
         commentFile.close()
         
-    gradeFile = open(kwargs["grade"],'a+')
+    gradeFile = open(grade,'a+')
     gradeFile.write(str(errorCount*0.5))
     gradeFile.write('\n')
     gradeFile.close()
@@ -208,9 +208,9 @@ def getFilePath():
 
 def main():
     filePathDict = getFilePath()
-    verifyTopo(filePathDict)
-    verifyBWM(filePathDict)
-    verifyQuiz(filePathDict)
+    verifyTopo(**filePathDict)
+    verifyBWM(**filePathDict)
+    verifyQuiz(**filePathDict)
     
 if __name__ == '__main__':
     main()
