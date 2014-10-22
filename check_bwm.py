@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python                                                                                                               
 
 import sys, os, csv, re
 import argparse
@@ -23,7 +23,7 @@ parser.add_argument('-i',
 args = parser.parse_args()
 pat_iface = re.compile(args.pat_iface)
 
-#there are five folders in dir, they are n1, n2, n3, n4, n5, we only check n2,3,4,5
+#there are five folders in dir, they are n1, n2, n3, n4, n5, we only check n2,3,4,5                                             
 acceptable_range = {'2' : (3, 7), '3' : (0.5, 6), '4' : (0.2, 6), '5' : (0.2, 6)}
 
 def read_list(fname, delim=','):
@@ -57,14 +57,14 @@ def verifyTopo(submission, grade, comment):
                     rate[ifname].append(float(row[column]) * 8.0 / (1 << 20))
                 except:
                     break
-        
-        
+
+
         for k in sorted(rate.keys()):
             if pat_iface.match(k):
                 print k
                 result = check(rate[k])
                 if result:
-                    print 'Successful check', filePath
+                 #   print 'Successful check', filePath                                                                         
                     continue
                 else:
                     errorCount += 1
@@ -73,7 +73,7 @@ def verifyTopo(submission, grade, comment):
         commentFile = open(comment, 'a+')
         commentFile.write('topo setup is not right\n')
         commentFile.close()
-    
+
     gradeFile = open(grade, 'a+')
     gradeFile.write(str(errorCount))
     gradeFile.write('\n')
@@ -81,11 +81,11 @@ def verifyTopo(submission, grade, comment):
 
 def verifyBWM(submission, grade, comment):
     errorCount = 0
-    #in submission dir, there are several bwm.txt files
+    #in submission dir, there are several bwm.txt files                                                                         
     for i in range(2, 6):
         fileName = 'bwm'+str(i)+'.txt'
         filePath = os.path.join(submission, fileName)
-        
+
         r = acceptable_range[str(i)]
         data = read_list(filePath)
         rate = {}
@@ -109,7 +109,7 @@ def verifyBWM(submission, grade, comment):
                 print k
                 result = checkBwmRange(rate[k], r)
                 if result:
-                    print 'Successful check', filePath
+                   # print 'Successful check', filePath                                                                         
                     continue
                 else:
                     errorCount += 1
@@ -119,22 +119,22 @@ def verifyBWM(submission, grade, comment):
         commentFile = open(comment,'a+')
         commentFile.write('BWM output is not acceptable\n')
         commentFile.close()
-        
+
     gradeFile =open(grade,'a+')
     gradeFile.write(str(errorCount))
     gradeFile.write('\n')
     gradeFile.close()
 
 def verifyQuiz(submission, grade, comment):
-    
+
     answer = [['B'], ['C', 'D'], ['A'], ['D'], ['D'], ['B']]
     quizPath = os.path.join(submission, "quiz.txt")
     if not os.path.isfile(quizPath):
-        # no quiz.txt
+        # no quiz.txt                                                                                                           
         return
 
     quizFile = open(quizPath, 'r')
-    
+
     lines = quizFile.xreadlines()
     count = 0
     i = 0
@@ -142,8 +142,8 @@ def verifyQuiz(submission, grade, comment):
 
     for line in lines:
         tokens = line.strip().split()
-        # tokens[1] is the corresponding answer for example tokens[1] = 'B'
-        # check if tokens[1] is correct answer
+        # tokens[1] is the corresponding answer for example tokens[1] = 'B'                                                     
+        # check if tokens[1] is correct answer                                                                                  
         if tokens[1] in answer[i]:
             count += 1
         else:
@@ -159,12 +159,11 @@ def verifyQuiz(submission, grade, comment):
             commentFile.write("%s\n" % item)
 
         commentFile.close()
-        
+
     gradeFile = open(grade,'a+')
     gradeFile.write(str(errorCount*0.5))
     gradeFile.write('\n')
     gradeFile.close()
-
 
 
 def check(bwmRate):
@@ -179,16 +178,16 @@ def check(bwmRate):
 
 
 def checkBwmRange(bwmRate, rateRange):
-    #we check the bwmRate, if bwmRate is within the range, then return true
-    # we pass the first two elements in bwmRate
+    #we check the bwmRate, if bwmRate is within the range, then return true                                                     
+    # we pass the first two elements in bwmRate                                                                                 
     checkRate = bwmRate[2:]
     for r in checkRate:
         if r <= rateRange[1] and r >= rateRange[0]:
             continue
         else:
-            #print r
+            #print r                                                                                                            
             return False
-    
+
     return True
 
 
@@ -202,7 +201,7 @@ def getFilePath():
     gradePath = gradePath.rstrip('\n')
     commentPath = stuInfoFile.readline()
     commentPath = commentPath.rstrip('\n')
-    
+
     filePathDict = {"submission" : submissionDir, "grade" : gradePath, "comment" : commentPath}
     return filePathDict
 
